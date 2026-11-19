@@ -1,0 +1,253 @@
+<resources>
+
+    <!-- Common -->
+    <string name="action_cancel">Huỷ</string>
+    <string name="action_close">Đóng</string>
+    <string name="action_continue">Tiếp tục</string>
+    <string name="action_delete">Xoá</string>
+    <string name="action_done">Xong</string>
+    <string name="action_exit">Thoát</string>
+    <string name="action_ok">OK</string>
+    <string name="action_retry">Thử lại</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_stay">Ở lại</string>
+
+    <!-- Mode select -->
+    <string name="mode_select_top_title">KaoriosPatcher</string>
+    <string name="mode_select_heading">Chọn chế độ làm việc</string>
+    <string name="mode_select_subtitle">Mỗi chế độ tạo workspace riêng</string>
+    <string name="mode_kaorios_desc">Chỉnh sửa framework và services</string>
+    <string name="mode_dex_desc">Phân chia lại tài nguyên dex cho file jar</string>
+    <string name="mode_other_title">File Jar khác</string>
+    <string name="mode_other_desc">Chỉnh sửa 1 file .jar bất kỳ</string>
+    <string name="mode_permission_hint">Yêu cầu cấp quyền truy cập bộ nhớ</string>
+    <string name="cd_log">Nhật ký</string>
+    <string name="cd_settings">Cài đặt</string>
+
+    <!-- Jar picker -->
+    <string name="picker_title_fmt">Chọn jar — %1$s</string>
+    <string name="picker_hint_kaorios">Chọn 2 file framework.jar và services.jar từ bộ nhớ hoặc trực tiếp từ /system/framework.</string>
+    <string name="picker_hint_dex_redivision">Chọn 1 file .jar bất kỳ. Các dex sẽ được phân chia trước khi chỉnh sửa</string>
+    <string name="picker_hint_other">Chọn 1 file jar bất kỳ.</string>
+    <string name="picker_source_storage">Bộ nhớ</string>
+    <string name="picker_source_system">Hệ thống</string>
+    <string name="picker_change">Đổi</string>
+    <string name="picker_select">Chọn</string>
+    <string name="picker_start">Bắt đầu giải nén</string>
+    <string name="picker_limit_label">Limit mỗi dex</string>
+    <string name="picker_limit_hint">Khuyến nghị 64000. Sau khi giải nén sẽ redistribute smali thành classes, classes2, …</string>
+    <string name="picker_fill_all">Vui lòng chọn đầy đủ các jar trước.</string>
+    <string name="picker_system_missing_title">Không đọc được file</string>
+    <string name="picker_system_missing_body_fmt">%1$s không tồn tại hoặc không có quyền đọc.</string>
+    <string name="picker_system_missing_hint">Trên một số thiết bị/ROM, SELinux chặn app user đọc system. Hãy dùng ‘Bộ nhớ’ để trỏ đến file đã sao chép sẵn.</string>
+    <string name="picker_system_dialog_title">/system/framework (%1$d)</string>
+    <string name="picker_system_dialog_hint">Chọn jar để copy vào workspace. Dữ liệu gốc không bị thay đổi.</string>
+    <string name="picker_system_search">Tìm tên file…</string>
+    <string name="picker_system_unreadable">Không đọc được /system/framework. Thiết bị có thể chặn SELinux hoặc không được root.</string>
+    <string name="picker_default_framework_jar">framework.jar</string>
+    <string name="picker_default_services_jar">services.jar</string>
+    <string name="picker_default_input_fmt">%1$s.jar</string>
+
+    <!-- File browser -->
+    <string name="browser_title_workspace">Workspace</string>
+    <string name="browser_title_selected_fmt">Đã chọn %1$d</string>
+    <string name="browser_menu_log">Xem log</string>
+    <string name="browser_menu_mark_dex">Đánh dấu dex khi build</string>
+    <string name="browser_menu_toggle_virtual">Gộp ảo classes</string>
+    <string name="browser_search_placeholder">Gõ, rồi nhấn icon tìm kiếm…</string>
+    <string name="browser_search_count_fmt">Kết quả cho ‘%1$s’: %2$d file</string>
+    <string name="browser_loading">Đang tải workspace…</string>
+    <string name="browser_searching_fmt">Đang tìm ‘%1$s’…</string>
+    <string name="browser_empty">Workspace trống.</string>
+    <string name="browser_empty_search_fmt">Không tìm thấy ‘%1$s’</string>
+    <string name="browser_exit_confirm_title">Thoát khỏi phiên làm việc?</string>
+    <string name="browser_exit_confirm_body">Thư mục làm việc sẽ được giữ đến khi bạn bắt đầu phiên mới.</string>
+    <string name="browser_build_dialog_kaorios_title">Chọn kiểu Build</string>
+    <string name="browser_build_desc_jar">Build jar: đóng gói framework.jar / services.jar.</string>
+    <string name="browser_build_desc_module">Build module: Build module.zip</string>
+    <string name="browser_build_jar_button">Build jar</string>
+    <string name="browser_build_module_button">Build module</string>
+    <string name="browser_build_dialog_title_jar">Build jar</string>
+    <string name="browser_build_desc_dex_redivision">Compile toàn bộ classes rồi đóng gói, chọn thư mục export.</string>
+    <string name="browser_build_desc_default">Compile các dex có value=1 rồi đóng gói. Tiếp theo chọn thư mục export.</string>
+    <string name="browser_delete_confirm_title_fmt">Xóa %1$d mục?</string>
+    <string name="browser_delete_confirm_body">Sẽ xóa vĩnh viễn các thư mục/file đã chọn khỏi workspace. Không thể hoàn tác.</string>
+    <string name="browser_delete_toast_fmt">Đã xóa %1$d mục</string>
+    <string name="browser_import_picker_title">Chọn nơi import dex</string>
+    <string name="browser_script_picker_hint">Chọn Script thực thi</string>
+    <string name="browser_script_run_fmt">Chạy (%1$d)</string>
+    <string name="browser_script_tag_remove">Chạy đầu tiên nếu được chọn</string>
+    <string name="browser_script_tag_rebuild">Phân chia lại classes sau các script khác</string>
+    <string name="browser_script_group_toolbox">KaoriosToolbox (loại trừ lẫn nhau)</string>
+    <string name="browser_script_group_update">Update Kaorios Dex (loại trừ với Toolbox)</string>
+    <string name="browser_script_op_count_fmt"> • %1$d op</string>
+    <string name="browser_script_experimental_fmt"> • Experimental (%1$d op)</string>
+    <string name="browser_script_experimental_warn">⚠ Script đánh dấu Experimental chưa có operation nào.</string>
+    <string name="browser_actions_progress_title">Đang chạy actions…</string>
+    <string name="browser_dex_mark_title">Đánh dấu dex để build</string>
+    <string name="browser_dex_mark_body">Chọn các dex muốn build lại từ smali. Lưu file smali cũng tự động đánh dấu dex tương ứng.</string>
+    <string name="browser_tag_dialog_title">Tag release KaoriosToolbox</string>
+    <string name="browser_tag_dialog_body">Nhập tag release trên GitHub (Wuang26/Kaorios-Toolbox).</string>
+    <string name="browser_tag_dialog_placeholder">Ví dụ V2.0.3</string>
+    <string name="browser_tag_dialog_validating">Đang xác thực…</string>
+    <string name="browser_tag_dialog_accept">Xác thực &amp; Chạy</string>
+    <string name="browser_tag_dialog_hint_ok">Tag hợp lệ sẽ được lưu để Build module dùng lại.</string>
+    <string name="browser_tag_dialog_empty">Tag không được rỗng</string>
+    <string name="picker_limit_dialog_title">Giới hạn Dex Redivision</string>
+    <string name="picker_limit_dialog_body">Nhập số method/field tối đa mỗi dex. Classes sẽ được phân phối lại thành nhiều file dex.</string>
+    <string name="picker_limit_dialog_hint">Khoảng cho phép: 20000 - 64000</string>
+    <string name="browser_title_selection_fmt">Đã chọn %1$d</string>
+    <string name="browser_no_workspace_snackbar">Chưa có workspace</string>
+    <string name="browser_unknown_error">không rõ</string>
+    <string name="browser_split_pane_left">Trái</string>
+    <string name="browser_split_pane_right">Phải</string>
+    <string name="browser_pane_empty">Không có dữ liệu</string>
+    <string name="browser_script_picker_intro">Tick để chọn. Nhóm KaoriosToolbox (2.0.3 / 1.0.9) chỉ được chọn 1 cái. Script “Remove Aosp/Custom rom Hooks” luôn chạy trước các script khác nếu được chọn.</string>
+    <string name="browser_tag_title_fmt">Tag release %1$s</string>
+    <string name="browser_tag_dialog_extended_body">App sẽ kiểm tra release có asset .dex trước khi chạy.</string>
+    <string name="browser_dex_version_fmt">v%1$d</string>
+    <string name="browser_import_ok_fmt">Đã import vào %1$s/%2$s</string>
+    <string name="browser_export_none_selected">Chưa chọn mục nào</string>
+    <string name="browser_export_ok_fmt">Đã export %1$d class thành dex</string>
+    <string name="browser_tag_validate_failed">Không xác thực được tag — kiểm tra lại.</string>
+
+    <!-- Script warning dialog (5s countdown) -->
+    <string name="browser_script_warn_title">⚠ Cảnh báo</string>
+    <string name="browser_script_warn_continue_countdown_fmt">Tiếp tục (%1$ds)</string>
+    <string name="browser_script_warn_continue">Tiếp tục</string>
+    <string name="browser_script_warn_update_kaorios_dex">Tính năng này CHỈ hoạt động khi framework đã được vá KaoriosToolbox 2.0.3 trở lên. Tất cả thư mục kaorios/kousei hiện có sẽ bị xóa và thay bằng phiên bản bạn chọn.</string>
+    <string name="browser_script_warn_disable_secure_flag">Tính năng buộc file framework và services đã được vá dex KaoriosToolbox 2.0.3 trở lên. Hook gọi KaoriosHook.isSecureFlag() chỉ có sau khi đã vá bản đó.</string>
+
+    <string name="progress_starting">Bắt đầu…</string>
+    <string name="progress_actions_done">Hoàn tất</string>
+    <string name="progress_action_running_fmt">[%1$s] đang chạy…</string>
+
+    <!-- Toolbar icons content-descriptions -->
+    <string name="cd_search">Tìm kiếm</string>
+    <string name="cd_clear">Xoá</string>
+    <string name="cd_import_dex">Import dex</string>
+    <string name="cd_delete_selection">Xoá selection</string>
+    <string name="cd_export_merged_dex">Export merged dex</string>
+    <string name="cd_actions">Actions</string>
+    <string name="cd_build">Build</string>
+    <string name="cd_save_log">Lưu log</string>
+    <string name="cd_back">Quay lại</string>
+    <string name="cd_more">Thêm</string>
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
+    <string name="cd_prev">Trước</string>
+    <string name="cd_next">Sau</string>
+    <string name="cd_replace_one">Thay 1</string>
+    <string name="cd_replace_all">Thay tất cả</string>
+
+    <!-- Smali editor -->
+    <string name="editor_dirty_dot">●</string>
+    <string name="editor_menu_method_list">Danh sách method</string>
+    <string name="editor_menu_string_list">Danh sách strings</string>
+    <string name="editor_menu_jump_to_line">Nhảy đến dòng...</string>
+    <string name="editor_menu_jump_reference">Jump to reference tại dòng</string>
+    <string name="editor_menu_smali_instructions">Smali instructions</string>
+    <string name="editor_menu_translate_java">Dịch sang Java (jadx)</string>
+    <string name="editor_menu_settings">Cài đặt editor</string>
+    <string name="editor_dirty_confirm_title">Chưa lưu</string>
+    <string name="editor_dirty_confirm_body_fmt">File %1$s có thay đổi chưa lưu. Bạn muốn làm gì?</string>
+    <string name="editor_dirty_save_exit">Lưu và thoát</string>
+    <string name="editor_dirty_discard">Bỏ thay đổi</string>
+    <string name="editor_search_find">Tìm…</string>
+    <string name="editor_search_replace">Thay bằng…</string>
+    <string name="editor_jump_title">Nhảy đến dòng</string>
+    <string name="editor_jump_line_label">Số dòng</string>
+    <string name="editor_jump_go">Đi</string>
+    <string name="editor_instructions_title_fmt">Smali instructions (%1$d)</string>
+    <string name="editor_instructions_search">Tìm opcode…</string>
+    <string name="editor_method_list_title_fmt">Methods (%1$d)</string>
+    <string name="editor_method_list_search">Tìm method…</string>
+    <string name="editor_string_list_title_fmt">Strings (%1$d)</string>
+    <string name="editor_string_list_search">Tìm string…</string>
+    <string name="editor_reference_title">Reference tại dòng hiện tại</string>
+    <string name="editor_reference_method_invoke">Method invoke:</string>
+    <string name="editor_reference_field_access">Field access:</string>
+    <string name="editor_reference_not_found">Không nhận diện được invoke/field reference ở dòng này.</string>
+    <string name="editor_reference_resolved_fmt">Tìm thấy file: %1$s</string>
+    <string name="editor_reference_unresolved">Không tìm thấy class đích trong workspace.</string>
+    <string name="editor_copy_dialog_title">Copy</string>
+    <string name="editor_copy_filename_label">Tên file</string>
+    <string name="editor_copy_descriptor_label">Đường dẫn (smali descriptor)</string>
+    <string name="editor_class_sibling_title">Chọn class để dịch</string>
+    <string name="editor_class_sibling_single_fmt">Chỉ có 1 class %1$s trong thư mục. Không có inner/anonymous class nào.</string>
+    <string name="editor_class_sibling_multi_hint">Compile tất cả class để jadx có đủ context inner/anonymous. Bỏ chọn nếu muốn giảm tải.</string>
+    <string name="editor_class_sibling_primary">primary (bắt buộc)</string>
+    <string name="editor_class_sibling_confirm_fmt">Dịch (%1$d)</string>
+    <string name="editor_saved_info_fmt">Đã lưu %1$s</string>
+
+    <!-- Java view -->
+    <string name="java_view_subtitle_translating">Đang dịch…</string>
+    <string name="java_view_fail_title">Không dịch ngược được smali sang Java.</string>
+    <string name="java_view_see_log">Mở File Browser → menu ⋮ → Xem log để xem chi tiết.</string>
+    <string name="java_view_loading">Đang dịch smali → Java…</string>
+    <string name="java_view_search_placeholder">Tìm trong Java…</string>
+
+    <!-- Log viewer -->
+    <string name="log_title">Log</string>
+    <string name="log_exported">Đã lưu log</string>
+    <string name="log_save_failed_fmt">Lỗi: %1$s</string>
+    <string name="cd_clear_log">Xoá log</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt editor</string>
+    <string name="settings_section_display">Hiển thị</string>
+    <string name="settings_font_size_fmt">Cỡ chữ: %1$d sp</string>
+    <string name="settings_word_wrap">Word wrap</string>
+    <string name="settings_line_number">Hiện số dòng</string>
+    <string name="settings_tab_indent">Dùng Tab thay cho space khi indent</string>
+    <string name="settings_section_behavior">Hành vi</string>
+    <string name="settings_auto_save">Auto-save khi rời màn hình</string>
+    <string name="settings_section_theme">Giao diện</string>
+    <string name="settings_theme_system">Hệ thống</string>
+    <string name="settings_theme_dark">Tối</string>
+    <string name="settings_theme_light">Sáng</string>
+
+    <!-- Build progress -->
+    <string name="build_progress_wiping_old">Dọn workspace cũ</string>
+    <string name="build_copy_jar_fmt">Chép jar %1$s</string>
+    <string name="build_extract_fmt">Giải nén %1$s</string>
+    <string name="build_decompile_fmt">Decompile %1$s</string>
+    <string name="build_decompile_progress_fmt">Decompile %1$s (%2$d/%3$d)</string>
+    <string name="build_merged_decompile_progress_fmt">Merged decompile %1$s (%2$d/%3$d)</string>
+    <string name="build_fail_fmt">Build lỗi: %1$s</string>
+    <string name="actions_ok_fmt">Actions OK (%1$d/%2$d)</string>
+    <string name="actions_error_fmt">Actions lỗi: %1$s</string>
+    <string name="build_done_jar_fmt">Build jar xong: %1$d dex, %2$d file jar</string>
+    <string name="build_done_module_fmt">Build module xong: %1$d dex, tag module %2$s</string>
+    <string name="label_latest">latest</string>
+    <string name="build_progress_logical_fmt">Build %1$s</string>
+    <string name="build_progress_pack_jar_fmt">Đóng gói %1$s.jar</string>
+    <string name="build_progress_resolve_module_tag">Xác định tag module từ ActionState…</string>
+    <string name="build_progress_download_module_zip">Tải module .zip từ GitHub…</string>
+    <string name="build_progress_replace_module_jars">Thay framework.jar / services.jar trong module…</string>
+    <string name="build_progress_export_storage">Export ra bộ nhớ người dùng</string>
+    <string name="build_progress_download_module_pct_fmt">Tải module zip: %1$s</string>
+    <string name="build_progress_compile_dex_fmt">Compile %1$s (v%2$d)</string>
+    <string name="build_progress_compile_merged">Compile classes (merged)</string>
+    <string name="build_module_only_kaorios">Build module chỉ dùng được ở chế độ KaoriosPatcher.</string>
+    <string name="build_compile_failed_fmt">Compile %1$s lỗi: %2$s</string>
+    <string name="build_compile_merged_failed_fmt">Compile merged classes lỗi: %1$s</string>
+
+    <string name="picker_placeholder_framework">Chưa chọn framework.jar</string>
+    <string name="picker_placeholder_services">Chưa chọn services.jar</string>
+    <string name="picker_placeholder_jar">Chưa chọn .jar</string>
+    <string name="picker_error_limit_range">Limit phải trong khoảng 1000..65535.</string>
+    <string name="picker_display_system_fmt">system: %1$s</string>
+
+    <string name="prepare_error_unreadable_fmt">Không đọc được %1$s</string>
+    <string name="prepare_redivide_smali_fmt">Phân phối lại smali (limit=%1$d)</string>
+    <string name="prepare_redivision_parse_smali">Phân tích smali</string>
+    <string name="prepare_redivision_allocate">Phân phối dex</string>
+    <string name="prepare_redivision_move">Di chuyển smali</string>
+    <string name="prepare_substage_fmt">%1$s (%2$d/%3$d)</string>
+
+    <string name="editor_ref_owner_line">owner=%1$s</string>
+    <string name="editor_ref_name_line">name=%1$s</string>
+    <string name="editor_ref_desc_line">desc=%1$s</string>
+    <string name="editor_ref_type_line">type=%1$s</string>
+</resources>

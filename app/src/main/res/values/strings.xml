@@ -1,0 +1,258 @@
+<resources>
+    <string name="app_name" translatable="false">Kaorios Patcher</string>
+
+    <!-- ================= Common ================= -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_done">Done</string>
+    <string name="action_exit">Exit</string>
+    <string name="action_ok">OK</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_save">Save</string>
+    <string name="action_stay">Stay</string>
+
+    <!-- ================= Mode select ================= -->
+    <string name="mode_select_top_title">KaoriosPatcher</string>
+    <string name="mode_select_heading">Choose working mode</string>
+    <string name="mode_select_subtitle">Each mode creates its own workspace</string>
+    <string name="mode_kaorios_title" translatable="false">Kaorios Patcher</string>
+    <string name="mode_kaorios_desc">Edit framework and Services</string>
+    <string name="mode_dex_title" translatable="false">Dex Redivision</string>
+    <string name="mode_dex_desc">Merge all classes into a single folder</string>
+    <string name="mode_other_title">Other Jar</string>
+    <string name="mode_other_desc">Edit any single .jar file</string>
+    <string name="mode_permission_hint">Grants storage if needed.</string>
+    <string name="cd_log">Log</string>
+    <string name="cd_settings">Settings</string>
+
+    <!-- ================= Jar picker ================= -->
+    <string name="picker_title_fmt">Pick jar — %1$s</string>
+    <string name="picker_hint_kaorios">Pick framework.jar and services.jar from storage or directly from /system/framework.</string>
+    <string name="picker_hint_dex_redivision">Pick any .jar file. All classes will be decompiled and merged into a single classes/ folder.</string>
+    <string name="picker_hint_other">Pick any jar file</string>
+    <string name="picker_source_storage">Storage</string>
+    <string name="picker_source_system">System</string>
+    <string name="picker_change">Change</string>
+    <string name="picker_select">Select</string>
+    <string name="picker_start">Start extracting</string>
+    <string name="picker_limit_label">Limit per dex</string>
+    <string name="picker_limit_hint">Recommended 64000. After extraction, smali will be redistributed into classes, classes2, …</string>
+    <string name="picker_fill_all">Please pick all jars first.</string>
+    <string name="picker_system_missing_title">Cannot read file</string>
+    <string name="picker_system_missing_body_fmt">%1$s does not exist or cannot be read.</string>
+    <string name="picker_system_missing_hint">On some ROMs, SELinux blocks user apps from reading /system/framework. Use ‘Storage’ to choose a pre-copied file.</string>
+    <string name="picker_system_dialog_title">/system/framework (%1$d)</string>
+    <string name="picker_system_dialog_hint">Pick a jar to copy into workspace. Original is not modified.</string>
+    <string name="picker_system_search">Search filename…</string>
+    <string name="picker_system_unreadable">Cannot read /system/framework. Device may block via SELinux or not be rooted.</string>
+    <string name="picker_default_framework_jar">framework.jar</string>
+    <string name="picker_default_services_jar">services.jar</string>
+    <string name="picker_default_input_fmt">%1$s.jar</string>
+
+    <!-- ================= File browser ================= -->
+    <string name="browser_title_workspace">Workspace</string>
+    <string name="browser_title_selected_fmt">%1$d selected</string>
+    <string name="browser_menu_log">View log</string>
+    <string name="browser_menu_mark_dex">Mark dex for build</string>
+    <string name="browser_menu_toggle_virtual">Virtual classes merge</string>
+    <string name="browser_search_placeholder">Type, then tap search icon…</string>
+    <string name="browser_search_count_fmt">Result for ‘%1$s’: %2$d file(s)</string>
+    <string name="browser_loading">Loading workspace…</string>
+    <string name="browser_searching_fmt">Searching ‘%1$s’…</string>
+    <string name="browser_empty">Workspace is empty.</string>
+    <string name="browser_empty_search_fmt">No results for ‘%1$s’</string>
+    <string name="browser_exit_confirm_title">Exit working session?</string>
+    <string name="browser_exit_confirm_body">The workspace will be kept until you start a new session.</string>
+    <string name="browser_build_dialog_kaorios_title">How to build?</string>
+    <string name="browser_build_desc_jar">Build jar: compile dex with value=1 and package framework.jar / services.jar.</string>
+    <string name="browser_build_desc_module">Build module: Build module.zip</string>
+    <string name="browser_build_jar_button">Build jar</string>
+    <string name="browser_build_module_button">Build module</string>
+    <string name="browser_build_dialog_title_jar">Build jar</string>
+    <string name="browser_build_desc_dex_redivision">Compile entire classes and repack, then choose export folder.</string>
+    <string name="browser_build_desc_default">Compile dex with value=1 and repack. Then choose export folder.</string>
+    <string name="browser_delete_confirm_title_fmt">Delete %1$d item(s)?</string>
+    <string name="browser_delete_confirm_body">The selected folders/files will be permanently deleted from the workspace. This cannot be undone.</string>
+    <string name="browser_delete_toast_fmt">Deleted %1$d item(s)</string>
+    <string name="browser_import_picker_title">Import dex to?</string>
+    <string name="browser_script_picker_title" translatable="false">Actions</string>
+    <string name="browser_script_picker_hint">Select Script</string>
+    <string name="browser_script_run_fmt">Run (%1$d)</string>
+    <string name="browser_script_tag_remove">Runs first if selected</string>
+    <string name="browser_script_tag_rebuild">Redivides classes after other scripts</string>
+    <string name="browser_script_tag_toolbox" translatable="false">KaoriosToolbox (mutual exclusion)</string>
+    <string name="browser_script_group_toolbox">KaoriosToolbox (mutual exclusion)</string>
+    <string name="browser_script_group_update">Update Kaorios Dex (mutual exclusion with Toolbox)</string>
+    <string name="browser_script_op_count_fmt"> • %1$d op</string>
+    <string name="browser_script_experimental_fmt"> • Experimental (%1$d op)</string>
+    <string name="browser_script_experimental_warn">⚠ Script marked Experimental has no operations yet.</string>
+    <string name="browser_actions_progress_title">Running actions…</string>
+    <string name="browser_dex_mark_title">Mark dex for build</string>
+    <string name="browser_dex_mark_body">Tick dex files to rebuild from smali. Saving a smali file in the editor auto-marks the containing dex.</string>
+    <string name="browser_tag_dialog_title">KaoriosToolbox release tag</string>
+    <string name="browser_tag_dialog_body">Enter the release tag on GitHub (Wuang26/Kaorios-Toolbox).</string>
+    <string name="browser_tag_dialog_placeholder">e.g. V2.0.3</string>
+    <string name="browser_tag_dialog_validating">Validating…</string>
+    <string name="browser_tag_dialog_accept">Validate &amp; Run</string>
+    <string name="browser_tag_dialog_hint_ok">A valid tag will be saved so Build module can reuse it.</string>
+    <string name="browser_tag_dialog_empty">Tag must not be empty</string>
+    <string name="picker_limit_dialog_title">Dex Redivision Limit</string>
+    <string name="picker_limit_dialog_body">Enter the maximum method/field count per dex. Classes will be redistributed into multiple dex files.</string>
+    <string name="picker_limit_dialog_hint">Allowed range: 20000 - 64000</string>
+    <string name="browser_title_selection_fmt">%1$d selected</string>
+    <string name="browser_no_workspace_snackbar">No workspace loaded yet</string>
+    <string name="browser_unknown_error">unknown</string>
+    <string name="browser_split_pane_left">Left</string>
+    <string name="browser_split_pane_right">Right</string>
+    <string name="browser_pane_empty">No data</string>
+    <string name="browser_script_picker_intro">Check scripts to run. Only one KaoriosToolbox (2.0.3 / 1.0.9) at a time. “Remove Aosp/Custom rom Hooks” runs before other scripts when selected.</string>
+    <string name="browser_tag_title_fmt">%1$s release tag</string>
+    <string name="browser_tag_dialog_extended_body">The app checks that the release has a .dex asset before running.</string>
+    <string name="browser_dex_version_fmt">v%1$d</string>
+    <string name="browser_import_ok_fmt">Imported into %1$s/%2$s</string>
+    <string name="browser_export_none_selected">Nothing selected</string>
+    <string name="browser_export_ok_fmt">Exported %1$d class(es) to DEX</string>
+    <string name="browser_tag_validate_failed">Could not validate tag — try again.</string>
+
+    <!-- Script warning dialog (5s countdown) -->
+    <string name="browser_script_warn_title">⚠ Warning</string>
+    <string name="browser_script_warn_continue_countdown_fmt">Continue (%1$ds)</string>
+    <string name="browser_script_warn_continue">Continue</string>
+    <string name="browser_script_warn_update_kaorios_dex">This feature only works with framework already patched with KaoriosToolbox 2.0.3 or newer. All existing kaorios/kousei folders will be removed and replaced with the version you choose.</string>
+    <string name="browser_script_warn_disable_secure_flag">This feature requires framework and services already patched with KaoriosToolbox dex 2.0.3 or newer. The hook calls KaoriosHook.isSecureFlag() which is only available after that patch.</string>
+
+    <string name="progress_starting">Starting…</string>
+    <string name="progress_actions_done">Finished</string>
+    <string name="progress_action_running_fmt">[%1$s] running…</string>
+
+    <!-- Toolbar icons content-descriptions -->
+    <string name="cd_search">Search</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_import_dex">Import dex</string>
+    <string name="cd_delete_selection">Delete selection</string>
+    <string name="cd_export_merged_dex">Export merged dex</string>
+    <string name="cd_actions">Actions</string>
+    <string name="cd_build">Build</string>
+    <string name="cd_save_log">Save log</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_more">More</string>
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
+    <string name="cd_prev">Previous</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_replace_one">Replace one</string>
+    <string name="cd_replace_all">Replace all</string>
+
+    <!-- ================= Smali editor ================= -->
+    <string name="editor_dirty_dot">●</string>
+    <string name="editor_menu_method_list">Method list</string>
+    <string name="editor_menu_string_list">String list</string>
+    <string name="editor_menu_jump_to_line">Jump to line…</string>
+    <string name="editor_menu_jump_reference">Jump to reference at cursor</string>
+    <string name="editor_menu_smali_instructions">Smali instructions</string>
+    <string name="editor_menu_translate_java">Translate to Java (jadx)</string>
+    <string name="editor_menu_settings">Editor settings</string>
+    <string name="editor_dirty_confirm_title">Not saved</string>
+    <string name="editor_dirty_confirm_body_fmt">File %1$s has unsaved changes. What do you want to do?</string>
+    <string name="editor_dirty_save_exit">Save and exit</string>
+    <string name="editor_dirty_discard">Discard</string>
+    <string name="editor_search_find">Find…</string>
+    <string name="editor_search_replace">Replace with…</string>
+    <string name="editor_jump_title">Jump to line</string>
+    <string name="editor_jump_line_label">Line number</string>
+    <string name="editor_jump_go">Go</string>
+    <string name="editor_instructions_title_fmt">Smali instructions (%1$d)</string>
+    <string name="editor_instructions_search">Find opcode…</string>
+    <string name="editor_method_list_title_fmt">Methods (%1$d)</string>
+    <string name="editor_method_list_search">Find method…</string>
+    <string name="editor_string_list_title_fmt">Strings (%1$d)</string>
+    <string name="editor_string_list_search">Find string…</string>
+    <string name="editor_reference_title">Reference at current line</string>
+    <string name="editor_reference_method_invoke">Method invoke:</string>
+    <string name="editor_reference_field_access">Field access:</string>
+    <string name="editor_reference_not_found">No invoke/field reference detected at this line.</string>
+    <string name="editor_reference_resolved_fmt">Found file: %1$s</string>
+    <string name="editor_reference_unresolved">Target class not found in workspace.</string>
+    <string name="editor_copy_dialog_title">Copy</string>
+    <string name="editor_copy_filename_label">File name</string>
+    <string name="editor_copy_descriptor_label">Path (smali descriptor)</string>
+    <string name="editor_class_sibling_title">Choose classes to translate</string>
+    <string name="editor_class_sibling_single_fmt">Only %1$s in this folder. No inner/anonymous class found.</string>
+    <string name="editor_class_sibling_multi_hint">Translate all for jadx to have full inner/anonymous context. Untick to reduce payload.</string>
+    <string name="editor_class_sibling_primary">primary (required)</string>
+    <string name="editor_class_sibling_confirm_fmt">Translate (%1$d)</string>
+    <string name="editor_saved_info_fmt">Saved %1$s</string>
+
+    <!-- ================= Java view ================= -->
+    <string name="java_view_subtitle_translating">Translating…</string>
+    <string name="java_view_fail_title">Cannot decompile smali to Java.</string>
+    <string name="java_view_see_log">Open File Browser → menu ⋮ → View log for full stack trace.</string>
+    <string name="java_view_loading">Translating smali → Java…</string>
+    <string name="java_view_search_placeholder">Search in Java…</string>
+
+    <!-- ================= Log viewer ================= -->
+    <string name="log_title">Log</string>
+    <string name="log_exported">Log saved</string>
+    <string name="log_save_failed_fmt">Failed: %1$s</string>
+    <string name="cd_clear_log">Clear log</string>
+
+    <!-- ================= Settings ================= -->
+    <string name="settings_title">Editor settings</string>
+    <string name="settings_section_display">Display</string>
+    <string name="settings_font_size_fmt">Font size: %1$d sp</string>
+    <string name="settings_word_wrap">Word wrap</string>
+    <string name="settings_line_number">Show line number</string>
+    <string name="settings_tab_indent">Use Tab instead of space for indent</string>
+    <string name="settings_section_behavior">Behavior</string>
+    <string name="settings_auto_save">Auto-save on screen exit</string>
+    <string name="settings_section_theme">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+
+    <!-- ================= Build / actions progress ================= -->
+    <string name="build_progress_wiping_old">Cleaning old workspace</string>
+    <string name="build_copy_jar_fmt">Copy %1$s</string>
+    <string name="build_extract_fmt">Extract %1$s</string>
+    <string name="build_decompile_fmt">Decompile %1$s</string>
+    <string name="build_decompile_progress_fmt">Decompiling %1$s (%2$d/%3$d)</string>
+    <string name="build_merged_decompile_progress_fmt">Merged decompile %1$s (%2$d/%3$d)</string>
+    <string name="build_fail_fmt">Build failed: %1$s</string>
+    <string name="actions_ok_fmt">Actions OK (%1$d/%2$d)</string>
+    <string name="actions_error_fmt">Actions error: %1$s</string>
+    <string name="build_done_jar_fmt">JAR build finished: %1$d dex compiled, %2$d output file(s)</string>
+    <string name="build_done_module_fmt">Module build finished: %1$d dex compiled, tag %2$s</string>
+    <string name="label_latest">latest</string>
+    <string name="build_progress_logical_fmt">Building %1$s</string>
+    <string name="build_progress_pack_jar_fmt">Packing %1$s.jar</string>
+    <string name="build_progress_resolve_module_tag">Resolving module tag from ActionState…</string>
+    <string name="build_progress_download_module_zip">Downloading module .zip from GitHub…</string>
+    <string name="build_progress_replace_module_jars">Replacing framework.jar / services.jar inside module…</string>
+    <string name="build_progress_export_storage">Exporting to user storage</string>
+    <string name="build_progress_download_module_pct_fmt">Downloading module zip: %1$s</string>
+    <string name="build_progress_compile_dex_fmt">Compiling %1$s (v%2$d)</string>
+    <string name="build_progress_compile_merged">Compiling classes (merged)</string>
+    <string name="build_module_only_kaorios">Module build is only available in KaoriosPatcher mode.</string>
+    <string name="build_compile_failed_fmt">Compile %1$s failed: %2$s</string>
+    <string name="build_compile_merged_failed_fmt">Merged compile failed: %1$s</string>
+
+    <string name="picker_placeholder_framework">framework.jar not selected</string>
+    <string name="picker_placeholder_services">services.jar not selected</string>
+    <string name="picker_placeholder_jar">No .jar selected</string>
+    <string name="picker_error_limit_range">Limit must be between 1000 and 65535.</string>
+    <string name="picker_display_system_fmt">system: %1$s</string>
+
+    <string name="prepare_error_unreadable_fmt">Cannot read file: %1$s</string>
+    <string name="prepare_redivide_smali_fmt">Redistributing smali (limit=%1$d)</string>
+    <string name="prepare_redivision_parse_smali">Parsing smali</string>
+    <string name="prepare_redivision_allocate">Allocating dex buckets</string>
+    <string name="prepare_redivision_move">Moving smali files</string>
+    <string name="prepare_substage_fmt">%1$s (%2$d/%3$d)</string>
+
+    <string name="editor_ref_owner_line">owner=%1$s</string>
+    <string name="editor_ref_name_line">name=%1$s</string>
+    <string name="editor_ref_desc_line">desc=%1$s</string>
+    <string name="editor_ref_type_line">type=%1$s</string>
+</resources>
