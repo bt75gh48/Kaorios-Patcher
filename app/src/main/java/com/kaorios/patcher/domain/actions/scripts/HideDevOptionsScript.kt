@@ -161,13 +161,11 @@ object HideDevOptionsScript : ActionScript {
             checkBannedWords = false
         ) { m ->
             val block = """
-                invoke-static/range {p1 .. p3}, Landroid/security/kaorios/KaoriosHook;->shouldHideDevStatusFromNameValueCache(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+                invoke-static/range {p1 .. p3}, Landroid/security/kaorios/KaoriosHook;->shouldHideDevStatusFromNameValueCache(Landroid/content/ContentResolver;Ljava/lang/String;I)Ljava/lang/String;
 
-                move-result v0
+                move-result-object v0
 
                 if-eqz v0, :cond_kaorios
-
-                const-string v0, "0"
 
                 return-object v0
 
