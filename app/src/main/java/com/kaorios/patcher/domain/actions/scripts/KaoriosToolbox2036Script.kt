@@ -120,20 +120,23 @@ object KaoriosToolbox2036Script : ActionScript {
         // vì payload dex chỉ có mặt ở bước này. Lỗi ở đây không rollback (file gốc đã commit),
         // chỉ ném ngược để ActionRunner đánh dấu script FAIL.
         val payloadRoot = File(frameworkRoot, imported)
-        val staged = stageCallers(roots)
+        val (staged, stagedNames) = stageCallers(roots)
         try {
             PayloadAbiVerifier.verifyCalls(staged, payloadRoot)
             LogSink.detail("Actions", "payload ABI PASS · ${staged.walkTopDown().count { it.isFile }} caller(s)")
 
-            if (File(staged, "android/app/ActivityThread.smali").isFile) {
+            // Cổng giống `run_directory_verifiers`: chỉ chạy verifier khi file mục tiêu
+            // có mặt trong tập đã stage. Không dò theo đường dẫn phẳng — file được stage
+            // dưới `<classesN>/<internal path>` nên đường dẫn phẳng luôn sai.
+            if ("ActivityThread.smali" in stagedNames) {
                 TreeVerifier.verifyActivityThread(staged)
                 LogSink.detail("Actions", "framework verifier PASS (ActivityThread)")
             }
-            if (File(staged, "com/android/server/pm/ComputerEngine.smali").isFile) {
+            if ("ComputerEngine.smali" in stagedNames) {
                 TreeVerifier.verifyServices(staged)
                 LogSink.detail("Actions", "services verifier PASS (ComputerEngine)")
             }
-            if (File(staged, "com/android/server/SystemServer.smali").isFile) {
+            if ("SystemServer.smali" in stagedNames) {
                 TreeVerifier.verifySystemServer(staged)
                 LogSink.detail("Actions", "systemserver verifier PASS")
             }
@@ -150,16 +153,21 @@ object KaoriosToolbox2036Script : ActionScript {
      * Gom các file mục tiêu đã patch vào một thư mục tạm, giữ nguyên relative path —
      * tương ứng `staged_root` của `process_files` bên Python. Nhờ vậy verifier chỉ nhìn
      * thấy caller, không quét lẫn payload vừa import.
+     *
+     * Trả kèm tập tên file đã stage — đây là `processed_filenames` mà
+     * `run_directory_verifiers` dùng làm cổng, không phải đường dẫn phẳng.
      */
-    private fun stageCallers(roots: List<File>): File {
+    private fun stageCallers(roots: List<File>): Pair<File, Set<String>> {
         val staged = kotlin.io.path.createTempDirectory("kaorios-preflight-").toFile()
-        for (desc in TargetPatcher.TARGETS.values) {
+        val names = mutableSetOf<String>()
+        for ((filename, desc) in TargetPatcher.TARGETS) {
             val source = SmaliEngine.findAllForClass(roots, desc).firstOrNull() ?: continue
             val root = roots.firstOrNull { source.startsWith(it) } ?: roots.first()
             val rel = source.relativeTo(root).path
             val dest = File(staged, rel).apply { parentFile?.mkdirs() }
             source.copyTo(dest, overwrite = true)
+            names += filename
         }
-        return staged
+        return staged to names
     }
 }
