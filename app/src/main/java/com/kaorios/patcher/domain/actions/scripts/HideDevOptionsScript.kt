@@ -486,6 +486,32 @@ object HideDevOptionsScript : ActionScript {
                 :cond_kaorios
             """.trimIndent()
             SmaliEngine.insertAfterRegisters(m, block)
-        }
+        },
+
+        ScriptOp(
+            key = "framework/Build.fields",
+            classDescriptor = "Landroid/os/Build;",
+            methodSignature = "<clinit>()V",
+            checkBannedWords = false,
+            patchMode = com.kaorios.patcher.domain.actions.PatchMode.BUILD,
+            fileTransform = { content ->
+                val patched = SmaliEngine.patchBuildFields(content)
+                SmaliEngine.verifyBuildFields(patched)
+                patched
+            }
+        ) { },
+
+        ScriptOp(
+            key = "framework/Build.VERSION.fields",
+            classDescriptor = "Landroid/os/Build\$VERSION;",
+            methodSignature = "<clinit>()V",
+            checkBannedWords = false,
+            patchMode = com.kaorios.patcher.domain.actions.PatchMode.BUILD,
+            fileTransform = { content ->
+                val patched = SmaliEngine.patchBuildVersionFields(content)
+                SmaliEngine.verifyBuildVersionFields(patched)
+                patched
+            }
+        ) { }
     )
 }

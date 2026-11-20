@@ -823,7 +823,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
             running = true,
             stage = getApplication<Application>().getString(R.string.progress_starting)
         )
-        val runner = ActionRunner(getApplication(), workDir, roots)
+        val runner = ActionRunner(getApplication(), workDir, roots, patchMode = com.kaorios.patcher.domain.actions.PatchMode.ALL)
         val results = mutableListOf<ActionRunner.RunResult>()
         for (entry in ordered) {
             _actionState.value = _actionState.value.copy(

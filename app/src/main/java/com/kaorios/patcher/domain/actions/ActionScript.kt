@@ -39,7 +39,9 @@ data class ScriptOp(
      * không dùng [methodSignature] để locate — hợp ROM dùng `main` thay `run`.
      */
     val methodAnchorLineContains: String? = null,
-    val transform: (SmaliEngine.MutableMethod) -> Unit
+    val patchMode: PatchMode = PatchMode.ORIGINAL,
+    val fileTransform: ((String) -> String)? = null,
+    val transform: (SmaliEngine.MutableMethod) -> Unit = {}
 )
 
 enum class ScriptPriority(val order: Int) { REMOVE_HOOKS(0), TOOLBOX(1), UPDATE(2), REBUILD(3) }

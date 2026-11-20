@@ -16,6 +16,70 @@ import java.io.File
  */
 object SmaliEngine {
 
+    private val BUILD_NULL_FIELDS = listOf(
+        "BRAND", "BRAND_FOR_ATTESTATION", "DEVICE", "DEVICE_FOR_ATTESTATION",
+        "FINGERPRINT", "HARDWARE", "ID", "MANUFACTURER", "MANUFACTURER_FOR_ATTESTATION",
+        "MODEL", "MODEL_FOR_ATTESTATION", "PRODUCT", "PRODUCT_FOR_ATTESTATION",
+        "TAGS", "TYPE", "USER"
+    )
+    private val BUILD_VERSION_FIELDS = listOf(
+        "RELEASE", "RELEASE_OR_CODENAME", "RELEASE_OR_PREVIEW_DISPLAY",
+        "SECURITY_PATCH", "DEVICE_INITIAL_SDK_INT"
+    )
+
+    /** Port of the 2.0.6.2 Build field patch. SDK_INT is intentionally excluded. */
+    fun patchBuildFields(content: String): String {
+        require(" TIME:J" in content) { "Build.smali: TIME:J not found" }
+        var result = content
+        BUILD_NULL_FIELDS.forEach { field ->
+            val pattern = Regex("(?m)^(\\.field public static[^\\n]*?)final([^\\n]*? $field:Ljava/lang/String;)(?:[ \\t]*=[^\\n]*)?$")
+            val absent = !Regex("(?m)^\\.field public static[^\\n]* $field:Ljava/lang/String;").containsMatchIn(result)
+            if (absent && field.endsWith("_FOR_ATTESTATION")) return@forEach
+            require(!absent) { "Build.smali: $field not found" }
+            result = pattern.replace(result) { "${it.groupValues[1]}${it.groupValues[2]} = null" }
+            result = Regex("(?m)^(\\.field public static[^\\n]* $field:Ljava/lang/String;)[ \\t]*=[^\\n]*$")
+                .replace(result, "$1 = null")
+        }
+        result = Regex("(?m)^(\\.field public static[^\\n]*?)final([^\\n]*? TIME:J.*)$")
+            .replace(result, "$1$2")
+        return result
+    }
+
+    /** Port of the 2.0.6.2 Build$VERSION field patch. */
+    fun patchBuildVersionFields(content: String): String {
+        var result = content
+        BUILD_VERSION_FIELDS.forEach { field ->
+            val pattern = Regex("(?m)^(\\.field public static[^\\n]*?)final([^\\n]*? $field:[^\\s]+.*)$")
+            require(Regex("(?m)^\\.field public static[^\\n]* $field:[^\\s]+").containsMatchIn(result)) {
+                "Build\$VERSION.smali: $field not found"
+            }
+            result = pattern.replace(result, "$1$2")
+        }
+        return result
+    }
+
+    fun verifyBuildFields(content: String) {
+        BUILD_NULL_FIELDS.forEach { field ->
+            val match = Regex("(?m)^\\.field public static[^\\n]* $field:Ljava/lang/String;.*$").find(content)
+            if (match == null && field.endsWith("_FOR_ATTESTATION")) return@forEach
+            require(match != null && " final" !in match.value && "= null" in match.value) {
+                "Build.smali: invalid post-patch field $field"
+            }
+        }
+        val time = Regex("(?m)^\\.field public static[^\\n]* TIME:J.*$").find(content)
+        require(time != null && " final" !in time.value) { "Build.smali: TIME:J remains final" }
+        require(Regex("(?m)^\\.field public static[^\\n]* SDK_INT:").find(content)?.value?.contains(" final") != false) {
+            "Build.smali: SDK_INT must remain final"
+        }
+    }
+
+    fun verifyBuildVersionFields(content: String) {
+        BUILD_VERSION_FIELDS.forEach { field ->
+            val line = Regex("(?m)^\\.field public static[^\\n]* $field:[^\\s]+.*$").find(content)
+            require(line != null && " final" !in line.value) { "Build\$VERSION.smali: invalid $field" }
+        }
+    }
+
     val BANNED_KEYWORDS = listOf(
         "kaorios", "crdroid", "neotric", "evolution",
         "setprop", "setprops", "hook", "android/util", "axion", "danda", "moonos", "elite"

@@ -24,7 +24,8 @@ import java.io.File
 class ActionRunner(
     private val ctx: Context,
     private val workDir: File,
-    private val roots: List<File>
+    private val roots: List<File>,
+    private val patchMode: PatchMode = PatchMode.ALL
 ) {
     private val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
 
@@ -50,7 +51,7 @@ class ActionRunner(
             val snapshotMap = mutableMapOf<String, SnapshotFile>() // opKey → snapshot info
 
             // Pass 1: copy file + init entry
-            for (op in script.operations) {
+            for (op in script.operations.filter { patchMode.includes(it.patchMode) }) {
                 progress("[${script.id}] chuẩn bị ${op.key}")
                 try {
                     val srcFile = SmaliEngine.findFileForClass(roots, op.classDescriptor)
@@ -71,7 +72,7 @@ class ActionRunner(
             LogSink.detail("Actions", "prep · $prepOk file(s) ready" + if (prepFail > 0) ", $prepFail failed" else "")
 
             // Pass 2: patch từng op
-            for (op in script.operations) {
+            for (op in script.operations.filter { patchMode.includes(it.patchMode) }) {
                 if (entry[op.key] == 1) {
                     LogSink.w("Actions", "patch SKIP · ${op.key} (prep failed)")
                     continue
@@ -140,6 +141,11 @@ class ActionRunner(
         }
 
     private fun applyOp(op: ScriptOp, snapshotFile: File) {
+        if (op.fileTransform != null) {
+            val transformed = op.fileTransform.invoke(snapshotFile.readText())
+            snapshotFile.writeText(transformed)
+            return
+        }
         val slice = when (val anchor = op.methodAnchorLineContains) {
             null -> SmaliEngine.extractMethod(snapshotFile, op.methodSignature)
                 ?: error("Không tìm method `${op.methodSignature}` trong ${snapshotFile.name}")
