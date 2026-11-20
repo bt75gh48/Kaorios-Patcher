@@ -228,7 +228,29 @@ object SmaliEngine {
     fun insertAfterRegisters(method: MutableMethod, block: String) {
         val idx = method.body.indexOfFirst { it.trimStart().startsWith(".registers ") }
         if (idx < 0) error("Không tìm thấy `.registers` trong method ${methodName(method)}")
+        require(method.body.count { it.trim() == "#Start KaoriosHook" } == 0) {
+            "Duplicate KaoriosHook block in ${methodName(method)}"
+        }
         method.body.addAll(idx + 1, wrapHookBlock(block))
+    }
+
+    /** Reject duplicate hooks before any new hook block is inserted. */
+    fun requireSingleExecutableHook(method: MutableMethod, hook: String) {
+        val escaped = Regex.escape(hook)
+        val count = method.body.count { Regex("^\\s*${escaped}\\s*(?:#.*)?$").matches(it) }
+        require(count <= 1) { "Duplicate executable hook: $hook" }
+    }
+
+    /** Verify the two preceding branches are conditional-zero guards. */
+    fun requireIfEqzPredecessors(method: MutableMethod, anchor: String) {
+        val idx = method.body.indexOfFirst { it.contains(anchor) }
+        require(idx >= 2) { "Missing branch-order anchor: $anchor" }
+        val branches = method.body.subList(0, idx).asReversed()
+            .filter { it.trim().startsWith("if-") }
+            .take(2)
+        require(branches.size == 2 && branches.all { it.trim().startsWith("if-eqz") }) {
+            "Unsafe branch order before $anchor"
+        }
     }
 
     /** Chèn khối sau dòng `.end annotation`. */
