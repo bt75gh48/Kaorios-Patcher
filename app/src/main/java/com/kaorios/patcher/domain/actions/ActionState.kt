@@ -7,7 +7,7 @@ import java.io.File
 
 /**
  * Lưu metadata sau khi các script chạy xong. Dùng để:
- * - Nhớ tag đã dùng cho script KaoriosToolbox (2036 / 109) trong phiên hiện tại.
+ * - Nhớ tag đã dùng cho script KaoriosToolbox / UpdateKaoriosDex trong phiên hiện tại.
  * - Khi Build module, chọn tag phù hợp theo script người dùng đã chạy.
  *
  * File lưu tại `<workDir>/action_state.json`.
@@ -15,7 +15,6 @@ import java.io.File
 object ActionState {
 
     const val SCRIPT_ID_TOOLBOX_2036 = "kaoriostoolbox_203"
-    const val SCRIPT_ID_TOOLBOX_109 = "kaoriostoolbox_109"
     const val SCRIPT_ID_UPDATE_KAORIOS_DEX = "update_kaorios_dex"
 
     private val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
@@ -53,11 +52,10 @@ object ActionState {
     fun getScriptTag(workDir: File, scriptId: String): String? =
         read(workDir).scripts[scriptId]?.tag
 
-    /** Priority: update > 2036 > 109 > null (latest). */
+    /** Priority: update > 2036 > null (latest). */
     fun preferredModuleTag(workDir: File): String? {
         val s = read(workDir)
         return s.scripts[SCRIPT_ID_UPDATE_KAORIOS_DEX]?.tag
             ?: s.scripts[SCRIPT_ID_TOOLBOX_2036]?.tag
-            ?: s.scripts[SCRIPT_ID_TOOLBOX_109]?.tag
     }
 }

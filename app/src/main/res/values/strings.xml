@@ -80,7 +80,7 @@
     <string name="browser_script_picker_title" translatable="false">Actions</string>
     <string name="browser_script_picker_hint">Select Script</string>
     <string name="browser_script_run_fmt">Run (%1$d)</string>
-    <string name="browser_script_tag_remove">Runs first if selected</string>
+    <string name="browser_script_tag_remove">Runs after KaoriosToolbox</string>
     <string name="browser_script_tag_rebuild">Redivides classes after other scripts</string>
     <string name="browser_script_tag_toolbox" translatable="false">KaoriosToolbox (mutual exclusion)</string>
     <string name="browser_script_group_toolbox">KaoriosToolbox (mutual exclusion)</string>
@@ -112,7 +112,7 @@
     <string name="browser_patch_mode_build">2 · Build spoof (Android 17 only)</string>
     <string name="browser_patch_mode_all">3 · Hooks + Build spoof (Android 17 only)</string>
     <string name="browser_patch_mode_hint">Build spoof rewrites Build fields that only Android 17 has. On Android 13–16 use mode 1.</string>
-    <string name="browser_script_picker_intro">Check scripts to run. Only one KaoriosToolbox (2.0.3 / 1.0.9) at a time. “Remove Aosp/Custom rom Hooks” runs before other scripts when selected.</string>
+    <string name="browser_script_picker_intro">Check scripts to run. KaoriosToolbox 2.0.6+ and Update Kaorios Dex exclude each other. Scripts run in the order listed.</string>
     <string name="browser_tag_title_fmt">%1$s release tag</string>
     <string name="browser_tag_dialog_extended_body">The app checks that the release has a .dex asset before running.</string>
     <string name="browser_dex_version_fmt">v%1$d</string>

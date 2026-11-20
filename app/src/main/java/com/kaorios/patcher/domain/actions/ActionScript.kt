@@ -49,6 +49,23 @@ data class ScriptOp(
     val transform: (SmaliEngine.MutableMethod) -> Unit = {}
 )
 
-enum class ScriptPriority(val order: Int) { REMOVE_HOOKS(0), TOOLBOX(1), UPDATE(2), REBUILD(3) }
+/**
+ * Thứ tự thực thi. Giá trị càng nhỏ chạy càng sớm.
+ *
+ * `TOOLBOX` đứng trước `REMOVE_*` vì KaoriosToolbox import dex và patch caller; các
+ * script remove/patch lẻ chạy sau trên cùng workspace.
+ */
+enum class ScriptPriority(val order: Int) {
+    TOOLBOX(0),
+    REMOVE_HOOKS(1),
+    REMOVE_INVOKE_CUSTOM(2),
+    REMOVE_BUILD_FLAG(3),
+    REBUILD(4),
+    UPDATE(5),
+    HIDE_DEV_OPTIONS(6),
+    HIDE_APP(7),
+    SPOOF_INSTALLED_SOURCE(8),
+    DISABLE_SECURE_FLAG(9)
+}
 
 enum class ScriptGroup { REMOVE, TOOLBOX, UPDATE, REBUILD }

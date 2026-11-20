@@ -9,7 +9,7 @@ package com.kaorios.patcher.domain.actions
  * Cùng repo với KaoriosToolbox — chỉ khác tag release.
  */
 object UpdateKaoriosDexConfig {
-    const val DEFAULT_TAG = "V2.0.4"
+    const val DEFAULT_TAG = "V2.0.6"
 
     @Volatile
     var currentTag: String = DEFAULT_TAG

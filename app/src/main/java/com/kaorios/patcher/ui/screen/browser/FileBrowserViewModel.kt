@@ -12,12 +12,10 @@ import com.kaorios.patcher.domain.actions.ActionState
 import com.kaorios.patcher.domain.actions.ActionsRegistry
 import com.kaorios.patcher.domain.actions.DexDownloader
 import com.kaorios.patcher.domain.actions.PatchMode
-import com.kaorios.patcher.domain.actions.Toolbox109Config
 import com.kaorios.patcher.domain.actions.Toolbox2036Config
 import com.kaorios.patcher.domain.actions.UpdateKaoriosDexConfig
 import com.kaorios.patcher.domain.actions.scripts.DexRedivisionScript
 import com.kaorios.patcher.domain.actions.scripts.DisableSecureFlagScript
-import com.kaorios.patcher.domain.actions.scripts.KaoriosToolbox109Script
 import com.kaorios.patcher.domain.actions.scripts.KaoriosToolbox2036Script
 import com.kaorios.patcher.domain.actions.scripts.UpdateKaoriosDexScript
 import com.kaorios.patcher.domain.model.DexEditedEntry
@@ -605,7 +603,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
     )
 
     /**
-     * Trạng thái chờ nhập tag cho Toolbox (2036 hoặc 109) trước khi thực sự chạy actions.
+     * Trạng thái chờ nhập tag cho Toolbox hoặc UpdateKaoriosDex trước khi thực sự chạy actions.
      * [scriptId] xác định script nào đang hỏi tag — dùng để pick đúng Config để update.
      * [scriptName] hiển thị trên tiêu đề dialog.
      */
@@ -661,7 +659,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
      * Preflight trước khi chạy:
      * 1. Nếu có UpdateKaoriosDex / DisableSecureFlag → show cảnh báo đỏ 5s trước.
      * 2. Nếu có DexRedivisionScript → show limit dialog.
-     * 3. Nếu có Toolbox 2036/109 hoặc UpdateKaoriosDex → show tag dialog.
+     * 3. Nếu có Toolbox hoặc UpdateKaoriosDex → show tag dialog.
      * 4. Còn lại → chạy thẳng.
      *
      * Các bước tách rời để có thể chaining: warning → limit/tag → execute.
@@ -687,12 +685,10 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
 
         val tagOwner = selected.firstOrNull {
             it.script.id == ActionState.SCRIPT_ID_TOOLBOX_2036 ||
-                it.script.id == ActionState.SCRIPT_ID_TOOLBOX_109 ||
                 it.script.id == ActionState.SCRIPT_ID_UPDATE_KAORIOS_DEX
         }
         if (tagOwner != null) {
             val (currentTag, defaultTag) = when (tagOwner.script.id) {
-                ActionState.SCRIPT_ID_TOOLBOX_109 -> Toolbox109Config.currentTag to Toolbox109Config.DEFAULT_TAG
                 ActionState.SCRIPT_ID_UPDATE_KAORIOS_DEX -> UpdateKaoriosDexConfig.currentTag to UpdateKaoriosDexConfig.DEFAULT_TAG
                 else -> Toolbox2036Config.currentTag to Toolbox2036Config.DEFAULT_TAG
             }
@@ -796,7 +792,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
             return@launch
         }
         _tagInput.value = snap.copy(validating = true, error = null)
-        // Toolbox 2036/109 và UpdateKaoriosDex cùng repo — dùng REPO_* của 2036 làm chung.
+        // Toolbox và UpdateKaoriosDex cùng repo — dùng REPO_* của 2036 làm chung.
         val res = runCatching {
             withContext(Dispatchers.IO) {
                 DexDownloader.resolveReleaseAsset(
@@ -810,7 +806,6 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
         res.onSuccess { asset ->
             LogSink.detail("Actions", "release tag OK · $tag → ${asset.name} (${asset.size}B) for ${snap.scriptId}")
             when (snap.scriptId) {
-                ActionState.SCRIPT_ID_TOOLBOX_109 -> Toolbox109Config.update(tag)
                 ActionState.SCRIPT_ID_UPDATE_KAORIOS_DEX -> UpdateKaoriosDexConfig.update(tag)
                 else -> Toolbox2036Config.update(tag)
             }

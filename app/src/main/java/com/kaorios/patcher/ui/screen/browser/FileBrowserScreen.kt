@@ -997,7 +997,13 @@ private fun ScriptPickerDialog(
         selected[id] = newVal
     }
 
-    val chosen = all.filter { selected[it.script.id] == true }
+    // Script chỉ có op BUILD (Remove Build Flag) không chạy được ở mode 1: ActionRunner coi
+    // "không còn op nào thuộc mode" là lỗi và dừng cả lượt chạy. Ẩn khỏi danh sách thay vì
+    // để nó giết các script phía sau.
+    fun runsInMode(entry: ActionsRegistry.Entry) =
+        entry.script.operations.isEmpty() || entry.script.operations.any { patchMode.includes(it.patchMode) }
+    val visible = all.filter(::runsInMode)
+    val chosen = all.filter { selected[it.script.id] == true && runsInMode(it) }
     // Cho phép script có operations rỗng nhưng chạy được toàn bộ trong afterCommit:
     // - DexRedivisionScript: redivide classes ở tầng folder.
     // - UpdateKaoriosDexScript: xóa folder kaorios/kousei + import dex mới.
@@ -1055,7 +1061,7 @@ private fun ScriptPickerDialog(
                 )
                 Spacer(Modifier.size(8.dp))
                 LazyColumn(Modifier.fillMaxSize()) {
-                    items(all, key = { it.script.id }) { entry ->
+                    items(visible, key = { it.script.id }) { entry ->
                         val checked = selected[entry.script.id] == true
                         Row(
                             modifier = Modifier

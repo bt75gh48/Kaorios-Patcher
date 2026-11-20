@@ -76,7 +76,7 @@
     <string name="browser_import_picker_title">Chọn nơi import dex</string>
     <string name="browser_script_picker_hint">Chọn Script thực thi</string>
     <string name="browser_script_run_fmt">Chạy (%1$d)</string>
-    <string name="browser_script_tag_remove">Chạy đầu tiên nếu được chọn</string>
+    <string name="browser_script_tag_remove">Chạy sau KaoriosToolbox</string>
     <string name="browser_script_tag_rebuild">Phân chia lại classes sau các script khác</string>
     <string name="browser_script_group_toolbox">KaoriosToolbox (loại trừ lẫn nhau)</string>
     <string name="browser_script_group_update">Update Kaorios Dex (loại trừ với Toolbox)</string>
@@ -107,7 +107,7 @@
     <string name="browser_patch_mode_build">2 · Build spoof (chỉ Android 17)</string>
     <string name="browser_patch_mode_all">3 · Hooks + Build spoof (chỉ Android 17)</string>
     <string name="browser_patch_mode_hint">Build spoof ghi lại các Build field chỉ có trên Android 17. Máy Android 13–16 dùng mode 1.</string>
-    <string name="browser_script_picker_intro">Tick để chọn. Nhóm KaoriosToolbox (2.0.3 / 1.0.9) chỉ được chọn 1 cái. Script “Remove Aosp/Custom rom Hooks” luôn chạy trước các script khác nếu được chọn.</string>
+    <string name="browser_script_picker_intro">Tick để chọn. KaoriosToolbox 2.0.6+ và Update Kaorios Dex loại trừ lẫn nhau. Các script chạy theo đúng thứ tự trong danh sách.</string>
     <string name="browser_tag_title_fmt">Tag release %1$s</string>
     <string name="browser_tag_dialog_extended_body">App sẽ kiểm tra release có asset .dex trước khi chạy.</string>
     <string name="browser_dex_version_fmt">v%1$d</string>

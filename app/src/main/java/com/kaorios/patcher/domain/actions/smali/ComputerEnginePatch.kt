@@ -326,6 +326,14 @@ object ComputerEnginePatch {
         if (hasInstallerMethods(text)) InstallerSourcePatch.verify(text)
     }
 
+    /** Chỉ `shouldFilterApplication` (hide app). */
+    fun verifyVisibilityOnly(text: String) = verifyVisibility(text)
+
+    /** Chỉ installer provenance (`InstallerSourcePatch`). */
+    fun hasInstaller(text: String): Boolean = hasInstallerMethods(text)
+
+    fun verifyInstallerOnly(text: String) = InstallerSourcePatch.verify(text)
+
     fun patch(text: String): Pair<String, Boolean> {
         var (patched, changed) = patchVisibility(text)
         if (hasInstallerMethods(text)) {
@@ -335,5 +343,20 @@ object ComputerEnginePatch {
         }
         verify(patched)
         return patched to changed
+    }
+
+    /** Chỉ patch `shouldFilterApplication` (hide app). */
+    fun patchVisibilityOnly(text: String): Pair<String, Boolean> {
+        val result = patchVisibility(text)
+        verifyVisibility(result.first)
+        return result
+    }
+
+    /** Chỉ patch installer provenance (spoof installed source). */
+    fun patchInstallerOnly(text: String): Pair<String, Boolean> {
+        require(hasInstallerMethods(text)) { "ComputerEngine: installer APIs not found" }
+        val result = InstallerSourcePatch.patch(text)
+        InstallerSourcePatch.verify(result.first)
+        return result
     }
 }
