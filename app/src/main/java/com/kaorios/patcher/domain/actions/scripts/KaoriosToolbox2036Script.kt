@@ -5,9 +5,14 @@ import com.kaorios.patcher.data.log.LogSink
 import com.kaorios.patcher.domain.actions.ActionScript
 import com.kaorios.patcher.domain.actions.ActionState
 import com.kaorios.patcher.domain.actions.DexDownloader
+import com.kaorios.patcher.domain.actions.PatchMode
 import com.kaorios.patcher.domain.actions.ScriptOp
 import com.kaorios.patcher.domain.actions.SmaliEngine
 import com.kaorios.patcher.domain.actions.Toolbox2036Config
+import com.kaorios.patcher.domain.actions.smali.PayloadAbiVerifier
+import com.kaorios.patcher.domain.actions.smali.TargetPatcher
+import com.kaorios.patcher.domain.actions.smali.TargetStatus
+import com.kaorios.patcher.domain.actions.smali.TreeVerifier
 import com.kaorios.patcher.domain.usecase.ImportDexUseCase
 import java.io.File
 
@@ -32,108 +37,40 @@ object KaoriosToolbox2036Script : ActionScript {
     const val REPO_NAME = "Kaorios-Toolbox"
 
     override val operations: List<ScriptOp> = listOf(
-        // Op 1: ApplicationPackageManager.hasSystemFeature — chèn hook sau .registers, KHÔNG check banned.
-        ScriptOp(
-            key = "framework/ApplicationPackageManager.hasSystemFeature",
-            classDescriptor = "Landroid/app/ApplicationPackageManager;",
-            methodSignature = "hasSystemFeature(Ljava/lang/String;I)Z",
-            checkBannedWords = false
-        ) { m ->
-            val block = """
-                invoke-static {p1, p2}, Landroid/security/kaorios/KaoriosHook;->hasSystemFeature(Ljava/lang/String;I)Ljava/lang/Boolean;
-
-                move-result-object v0
-
-                if-eqz v0, :cond_kaorios
-
-                invoke-virtual {v0}, Ljava/lang/Boolean;->booleanValue()Z
-
-                move-result v0
-
-                return v0
-
-                :cond_kaorios
-            """.trimIndent()
-            SmaliEngine.insertAfterRegisters(m, block)
-        },
-
-        // Op 2: Instrumentation.newApplication(Class, Context) — chèn initContext(p1) trước return-object cuối. KHÔNG check banned.
-        ScriptOp(
-            key = "framework/Instrumentation.newApplication_ClassContext",
-            classDescriptor = "Landroid/app/Instrumentation;",
-            methodSignature = "newApplication(Ljava/lang/Class;Landroid/content/Context;)Landroid/app/Application;",
-            checkBannedWords = false
-        ) { m ->
-            val hook = "invoke-static {p1}, Landroid/security/kaorios/KaoriosHook;->initContext(Landroid/content/Context;)V"
-            SmaliEngine.insertBeforeLastReturnObject(m, hook)
-        },
-
-        // Op 3: Instrumentation.newApplication(ClassLoader, String, Context) — chèn initContext(p3). KHÔNG check banned.
-        ScriptOp(
-            key = "framework/Instrumentation.newApplication_LoaderStringContext",
-            classDescriptor = "Landroid/app/Instrumentation;",
-            methodSignature = "newApplication(Ljava/lang/ClassLoader;Ljava/lang/String;Landroid/content/Context;)Landroid/app/Application;",
-            checkBannedWords = false
-        ) { m ->
-            val hook = "invoke-static {p3}, Landroid/security/kaorios/KaoriosHook;->initContext(Landroid/content/Context;)V"
-            SmaliEngine.insertBeforeLastReturnObject(m, hook)
-        },
-
-        // Op 4: AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPair — tăng .registers +1, chèn hook dùng reg mới. KHÔNG check banned.
-        ScriptOp(
-            key = "framework/AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPair",
-            classDescriptor = "Landroid/security/keystore2/AndroidKeyStoreKeyPairGeneratorSpi;",
-            methodSignature = "generateKeyPair()Ljava/security/KeyPair;",
-            checkBannedWords = false
-        ) { m ->
-            val newReg = SmaliEngine.incrementRegistersAndReturnFree(m)
-            val block = """
-                invoke-static {p0}, Landroid/security/kaorios/KaoriosHook;->initGenerateSoftwareKeyPair(Ljava/lang/Object;)Ljava/security/KeyPair;
-
-                move-result-object $newReg
-
-                if-eqz $newReg, :cond_kaorios
-
-                return-object $newReg
-
-                :cond_kaorios
-            """.trimIndent()
-            SmaliEngine.insertAfterRegisters(m, block)
-        },
-
-        // Op 5: AndroidKeyStoreSpi.engineGetCertificateChain — chèn CertificateChainIfNeeded sau aput-object.
-        // Không check banned: ROM có thể còn invoke tới `.../kaorios/...` (KaoriKeyboxHooks, v.v.) trước khi gỡ sạch.
-        ScriptOp(
-            key = "framework/AndroidKeyStoreSpi.engineGetCertificateChain",
-            classDescriptor = "Landroid/security/keystore2/AndroidKeyStoreSpi;",
-            methodSignature = "engineGetCertificateChain(Ljava/lang/String;)[Ljava/security/cert/Certificate;",
-            checkBannedWords = false
-        ) { m ->
-            SmaliEngine.insertHookAfterAputObjectSequence(m) { xB, xD ->
-                """
-                invoke-static {$xB}, Landroid/security/kaorios/KaoriosHook;->CertificateChainIfNeeded([Ljava/security/cert/Certificate;)[Ljava/security/cert/Certificate;
-
-                move-result-object $xD
-                """.trimIndent()
-            }
-        },
-
-        // Op 6: SystemServer — chèn initSystemServer() trước invoke startOtherServices (entry có thể là run hoặc main).
-        ScriptOp(
-            key = "services/SystemServer.initSystemServer",
-            classDescriptor = "Lcom/android/server/SystemServer;",
-            methodSignature = "run()V",
-            methodAnchorLineContains = "Lcom/android/server/SystemServer;->startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V",
-            checkBannedWords = false
-        ) { m ->
-            val hook = "invoke-static {}, Landroid/security/kaorios/KaoriosHook;->initSystemServer()V"
-            SmaliEngine.insertBeforeLineContaining(
-                m,
-                "Lcom/android/server/SystemServer;->startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V",
-                hook
-            )
-        }
+        hookOp("framework/ActivityThread", "ActivityThread.smali"),
+        hookOp("services/ComputerEngine", "ComputerEngine.smali"),
+        hookOp("services/SystemServer", "SystemServer.smali"),
+        hookOp("framework/Instrumentation", "Instrumentation.smali"),
+        hookOp("framework/ApplicationPackageManager", "ApplicationPackageManager.smali"),
+        hookOp("framework/Settings\$NameValueCache", "Settings\$NameValueCache.smali"),
+        hookOp("framework/AndroidKeyStoreSpi", "AndroidKeyStoreSpi.smali"),
+        hookOp("framework/AndroidKeyStoreKeyPairGeneratorSpi", "AndroidKeyStoreKeyPairGeneratorSpi.smali")
     )
+
+    /**
+     * Mỗi op patch trọn 1 file qua [TargetPatcher] (port của `apply_target_patch`).
+     * `optional = true`: ROM có thể chỉ có framework hoặc chỉ có services — thiếu file
+     * thì bỏ qua op thay vì rollback cả script.
+     */
+    private fun hookOp(key: String, filename: String): ScriptOp {
+        val owner = TargetPatcher.TARGETS.getValue(filename)
+        return ScriptOp(
+            key = key,
+            classDescriptor = owner,
+            methodSignature = "",
+            checkBannedWords = false,
+            optional = true,
+            patchMode = PatchMode.ORIGINAL,
+            fileTransform = { content ->
+                val result = TargetPatcher.apply(filename, content, update = false)
+                when (result.status) {
+                    TargetStatus.PATCHED, TargetStatus.ALREADY_PATCHED -> result.content
+                    TargetStatus.NOT_TARGET -> error("$filename không nằm trong danh sách mục tiêu patch")
+                    else -> error("$filename: ${result.status} — ${result.error}")
+                }
+            }
+        )
+    }
 
     /**
      * Sau khi commit OK: tải dex KaoriosToolbox 2.0.3.6 từ GitHub release và import vào
@@ -179,8 +116,50 @@ object KaoriosToolbox2036Script : ActionScript {
         val imported = ImportDexUseCase(ctx).invoke(frameworkRoot, dexFile, ownsFile = false)
         LogSink.detail("Actions", "Toolbox dex import OK → $imported")
 
+        // Port của `_verify_payload_calls` + `run_directory_verifiers`: chạy SAU khi import
+        // vì payload dex chỉ có mặt ở bước này. Lỗi ở đây không rollback (file gốc đã commit),
+        // chỉ ném ngược để ActionRunner đánh dấu script FAIL.
+        val payloadRoot = File(frameworkRoot, imported)
+        val staged = stageCallers(roots)
+        try {
+            PayloadAbiVerifier.verifyCalls(staged, payloadRoot)
+            LogSink.detail("Actions", "payload ABI PASS · ${staged.walkTopDown().count { it.isFile }} caller(s)")
+
+            if (File(staged, "android/app/ActivityThread.smali").isFile) {
+                TreeVerifier.verifyActivityThread(staged)
+                LogSink.detail("Actions", "framework verifier PASS (ActivityThread)")
+            }
+            if (File(staged, "com/android/server/pm/ComputerEngine.smali").isFile) {
+                TreeVerifier.verifyServices(staged)
+                LogSink.detail("Actions", "services verifier PASS (ComputerEngine)")
+            }
+            if (File(staged, "com/android/server/SystemServer.smali").isFile) {
+                TreeVerifier.verifySystemServer(staged)
+                LogSink.detail("Actions", "systemserver verifier PASS")
+            }
+        } finally {
+            staged.deleteRecursively()
+        }
+
         // Lưu tag vào ActionState — Build module sẽ dùng để chọn đúng module zip.
         ActionState.setScriptTag(workDir, ActionState.SCRIPT_ID_TOOLBOX_2036, tag)
         progress("Import Toolbox dex xong → $imported (tag $tag đã ghi nhận)")
+    }
+
+    /**
+     * Gom các file mục tiêu đã patch vào một thư mục tạm, giữ nguyên relative path —
+     * tương ứng `staged_root` của `process_files` bên Python. Nhờ vậy verifier chỉ nhìn
+     * thấy caller, không quét lẫn payload vừa import.
+     */
+    private fun stageCallers(roots: List<File>): File {
+        val staged = kotlin.io.path.createTempDirectory("kaorios-preflight-").toFile()
+        for (desc in TargetPatcher.TARGETS.values) {
+            val source = SmaliEngine.findAllForClass(roots, desc).firstOrNull() ?: continue
+            val root = roots.firstOrNull { source.startsWith(it) } ?: roots.first()
+            val rel = source.relativeTo(root).path
+            val dest = File(staged, rel).apply { parentFile?.mkdirs() }
+            source.copyTo(dest, overwrite = true)
+        }
+        return staged
     }
 }

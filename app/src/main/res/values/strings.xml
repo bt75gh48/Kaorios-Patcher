@@ -107,6 +107,11 @@
     <string name="browser_split_pane_left">Left</string>
     <string name="browser_split_pane_right">Right</string>
     <string name="browser_pane_empty">No data</string>
+    <string name="browser_patch_mode_title">Patch mode</string>
+    <string name="browser_patch_mode_original">1 · Hooks (Android 13–17)</string>
+    <string name="browser_patch_mode_build">2 · Build spoof (Android 17 only)</string>
+    <string name="browser_patch_mode_all">3 · Hooks + Build spoof (Android 17 only)</string>
+    <string name="browser_patch_mode_hint">Build spoof rewrites Build fields that only Android 17 has. On Android 13–16 use mode 1.</string>
     <string name="browser_script_picker_intro">Check scripts to run. Only one KaoriosToolbox (2.0.3 / 1.0.9) at a time. “Remove Aosp/Custom rom Hooks” runs before other scripts when selected.</string>
     <string name="browser_tag_title_fmt">%1$s release tag</string>
     <string name="browser_tag_dialog_extended_body">The app checks that the release has a .dex asset before running.</string>

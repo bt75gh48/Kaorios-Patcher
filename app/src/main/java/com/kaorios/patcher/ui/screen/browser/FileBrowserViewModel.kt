@@ -11,6 +11,7 @@ import com.kaorios.patcher.domain.actions.ActionRunner
 import com.kaorios.patcher.domain.actions.ActionState
 import com.kaorios.patcher.domain.actions.ActionsRegistry
 import com.kaorios.patcher.domain.actions.DexDownloader
+import com.kaorios.patcher.domain.actions.PatchMode
 import com.kaorios.patcher.domain.actions.Toolbox109Config
 import com.kaorios.patcher.domain.actions.Toolbox2036Config
 import com.kaorios.patcher.domain.actions.UpdateKaoriosDexConfig
@@ -610,6 +611,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
      */
     data class TagInputUi(
         val selected: List<ActionsRegistry.Entry> = emptyList(),
+        val patchMode: PatchMode = PatchMode.ORIGINAL,
         val scriptId: String = ActionState.SCRIPT_ID_TOOLBOX_2036,
         val scriptName: String = "",
         val tag: String = Toolbox2036Config.DEFAULT_TAG,
@@ -623,6 +625,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
      */
     data class LimitInputUi(
         val selected: List<ActionsRegistry.Entry> = emptyList(),
+        val patchMode: PatchMode = PatchMode.ORIGINAL,
         val limit: String = "64000",
         val error: String? = null,
         val showing: Boolean = false
@@ -634,6 +637,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
      */
     data class WarnUi(
         val selected: List<ActionsRegistry.Entry> = emptyList(),
+        val patchMode: PatchMode = PatchMode.ORIGINAL,
         val scriptIds: List<String> = emptyList(),
         val remainingSec: Int = 5,
         val showing: Boolean = false
@@ -662,22 +666,22 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
      *
      * Các bước tách rời để có thể chaining: warning → limit/tag → execute.
      */
-    fun requestRunActions(selected: List<ActionsRegistry.Entry>) {
+    fun requestRunActions(selected: List<ActionsRegistry.Entry>, patchMode: PatchMode) {
         val warnIds = selected.map { it.script.id }.filter {
             it == ActionState.SCRIPT_ID_UPDATE_KAORIOS_DEX ||
                 it == DisableSecureFlagScript.id
         }
         if (warnIds.isNotEmpty()) {
-            startWarnCountdown(selected, warnIds)
+            startWarnCountdown(selected, patchMode, warnIds)
             return
         }
-        proceedAfterWarn(selected)
+        proceedAfterWarn(selected, patchMode)
     }
 
-    private fun proceedAfterWarn(selected: List<ActionsRegistry.Entry>) {
+    private fun proceedAfterWarn(selected: List<ActionsRegistry.Entry>, patchMode: PatchMode) {
         val hasRedivision = selected.any { it.script.id == DexRedivisionScript.id }
         if (hasRedivision) {
-            _limitInput.value = LimitInputUi(selected = selected, showing = true)
+            _limitInput.value = LimitInputUi(selected = selected, patchMode = patchMode, showing = true)
             return
         }
 
@@ -694,19 +698,30 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
             }
             _tagInput.value = TagInputUi(
                 selected = selected,
+                patchMode = patchMode,
                 scriptId = tagOwner.script.id,
                 scriptName = tagOwner.script.displayName,
                 tag = currentTag.ifBlank { defaultTag },
                 showing = true
             )
         } else {
-            executeActions(selected)
+            executeActions(selected, patchMode)
         }
     }
 
-    private fun startWarnCountdown(selected: List<ActionsRegistry.Entry>, ids: List<String>) {
+    private fun startWarnCountdown(
+        selected: List<ActionsRegistry.Entry>,
+        patchMode: PatchMode,
+        ids: List<String>
+    ) {
         warnJob?.cancel()
-        _warn.value = WarnUi(selected = selected, scriptIds = ids, remainingSec = 5, showing = true)
+        _warn.value = WarnUi(
+            selected = selected,
+            patchMode = patchMode,
+            scriptIds = ids,
+            remainingSec = 5,
+            showing = true
+        )
         warnJob = viewModelScope.launch {
             while (_warn.value.showing && _warn.value.remainingSec > 0) {
                 kotlinx.coroutines.delay(1000)
@@ -727,8 +742,9 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
         if (!snap.showing || snap.remainingSec > 0) return
         warnJob?.cancel()
         val selected = snap.selected
+        val patchMode = snap.patchMode
         _warn.value = WarnUi()
-        proceedAfterWarn(selected)
+        proceedAfterWarn(selected, patchMode)
     }
 
     fun updatePendingLimit(limit: String) {
@@ -757,7 +773,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
         val workDir = _state.value.workDir ?: return
         DexRedivisionScript.saveRedivisionLimit(workDir, limitInt)
         _limitInput.value = LimitInputUi()
-        executeActions(snap.selected)
+        executeActions(snap.selected, snap.patchMode)
     }
 
     fun updatePendingTag(tag: String) {
@@ -799,8 +815,9 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
                 else -> Toolbox2036Config.update(tag)
             }
             val selected = snap.selected
+            val patchMode = snap.patchMode
             _tagInput.value = TagInputUi()
-            executeActions(selected)
+            executeActions(selected, patchMode)
         }.onFailure { t ->
             LogSink.w("Actions", "release tag FAIL · $tag (${snap.scriptId}): ${t.message}", t)
             _tagInput.value = snap.copy(
@@ -810,7 +827,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun executeActions(selected: List<ActionsRegistry.Entry>) = viewModelScope.launch {
+    private fun executeActions(selected: List<ActionsRegistry.Entry>, patchMode: PatchMode) = viewModelScope.launch {
         val workDir = _state.value.workDir ?: return@launch
         val roots = _state.value.roots.map { it.rootDecompDir }
         if (roots.isEmpty()) {
@@ -823,7 +840,7 @@ class FileBrowserViewModel(app: Application) : AndroidViewModel(app) {
             running = true,
             stage = getApplication<Application>().getString(R.string.progress_starting)
         )
-        val runner = ActionRunner(getApplication(), workDir, roots, patchMode = com.kaorios.patcher.domain.actions.PatchMode.ALL)
+        val runner = ActionRunner(getApplication(), workDir, roots, patchMode = patchMode)
         val results = mutableListOf<ActionRunner.RunResult>()
         for (entry in ordered) {
             _actionState.value = _actionState.value.copy(

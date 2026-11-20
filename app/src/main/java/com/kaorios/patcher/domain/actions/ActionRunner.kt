@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.nio.file.Files
 
 /**
  * Chạy 1 ActionScript với cơ chế snapshot → patch → commit/rollback.
@@ -48,18 +49,46 @@ class ActionRunner(
             script.operations.forEach { entry[it.key] = 0 }
             writeEntry(snapshotDir, entry)
 
+            // Script chỉ có hook chạy ở mode 2/3 sẽ lọc sạch operation → không được coi là
+            // thành công rồi chạy afterCommit (import dex mà chẳng patch gì).
+            val ops = script.operations.filter { patchMode.includes(it.patchMode) }
+            if (script.operations.isNotEmpty() && ops.isEmpty()) {
+                FileIo.deleteRecursively(snapshotDir)
+                LogSink.w("Actions", "SKIP · ${script.id} — không có op nào thuộc $patchMode")
+                return@withContext RunResult(
+                    scriptId = script.id,
+                    ok = false,
+                    entries = entry,
+                    error = "Script ${script.id} không có operation nào thuộc chế độ $patchMode"
+                )
+            }
+
             val snapshotMap = mutableMapOf<String, SnapshotFile>() // opKey → snapshot info
 
             // Pass 1: copy file + init entry
-            for (op in script.operations.filter { patchMode.includes(it.patchMode) }) {
+            for (op in ops) {
                 progress("[${script.id}] chuẩn bị ${op.key}")
                 try {
-                    val srcFile = SmaliEngine.findFileForClass(roots, op.classDescriptor)
-                        ?: throw IllegalStateException("Không tìm file cho ${op.classDescriptor}")
+                    val matches = SmaliEngine.findAllForClass(roots, op.classDescriptor)
+                    // Fail-closed: cùng một class ở nhiều classesN là layout mơ hồ, không đoán.
+                    check(matches.size <= 1) {
+                        "Unsupported layout: ambiguous duplicate target filenames (${op.classDescriptor})"
+                    }
+                    val srcFile = matches.firstOrNull()
+                    if (srcFile == null) {
+                        if (op.optional) {
+                            LogSink.d("Actions", "prep SKIP · ${op.key} (không có ${op.classDescriptor})")
+                            continue
+                        }
+                        throw IllegalStateException("Không tìm file cho ${op.classDescriptor}")
+                    }
+                    check(!Files.isSymbolicLink(srcFile.toPath())) {
+                        "Unsupported layout: symbolic-link target (${srcFile.name})"
+                    }
                     val rel = srcFile.relativeTo(workDir).path.replace('\\', '/')
                     val snapFile = File(snapshotDir, rel).apply { parentFile?.mkdirs() }
                     srcFile.copyTo(snapFile, overwrite = true)
-                    snapshotMap[op.key] = SnapshotFile(srcFile, snapFile, rel)
+                    snapshotMap[op.key] = SnapshotFile(srcFile, snapFile, rel, srcFile.readBytes())
                     LogSink.d("Actions", "prep copy: ${srcFile.name} ← $rel")
                 } catch (t: Throwable) {
                     LogSink.e("Actions", "prep FAIL · ${op.key}", t)
@@ -72,13 +101,19 @@ class ActionRunner(
             LogSink.detail("Actions", "prep · $prepOk file(s) ready" + if (prepFail > 0) ", $prepFail failed" else "")
 
             // Pass 2: patch từng op
-            for (op in script.operations.filter { patchMode.includes(it.patchMode) }) {
+            for (op in ops) {
                 if (entry[op.key] == 1) {
                     LogSink.w("Actions", "patch SKIP · ${op.key} (prep failed)")
                     continue
                 }
                 val snap = snapshotMap[op.key] ?: run {
-                    entry[op.key] = 1; continue
+                    if (op.optional) {
+                        LogSink.d("Actions", "patch SKIP · ${op.key} (không có file mục tiêu)")
+                        entry[op.key] = 0
+                    } else {
+                        entry[op.key] = 1
+                    }
+                    continue
                 }
                 progress("[${script.id}] patch ${op.key}")
                 try {
@@ -105,6 +140,21 @@ class ActionRunner(
             }
 
             // Commit: copy snapshot files đè lên gốc + đánh dấu dex dirty.
+            // Fail-closed: file gốc đổi giữa lúc preflight và lúc commit → không ghi gì cả.
+            val changedDuringPreflight = snapshotMap.values.filter {
+                !it.originalFile.isFile || !it.originalFile.readBytes().contentEquals(it.originalBytes)
+            }
+            if (changedDuringPreflight.isNotEmpty()) {
+                val names = changedDuringPreflight.joinToString { it.originalFile.name }
+                LogSink.w("Actions", "ROLLBACK · ${script.id} — target changed during preflight: $names")
+                FileIo.deleteRecursively(snapshotDir)
+                return@withContext RunResult(
+                    scriptId = script.id,
+                    ok = false,
+                    entries = entry,
+                    error = "Target changed during preflight; no files written: $names"
+                )
+            }
             progress("[${script.id}] commit ${snapshotMap.size} file(s)")
             val touchedDex = mutableSetOf<Pair<File /*root*/, String /*dexName*/>>()
             for (snap in snapshotMap.values) {
@@ -181,6 +231,8 @@ class ActionRunner(
     private data class SnapshotFile(
         val originalFile: File,
         val snapFile: File,
-        val relPath: String
+        val relPath: String,
+        /** Nội dung gốc lúc preflight — dùng để phát hiện file bị sửa giữa chừng. */
+        val originalBytes: ByteArray
     )
 }

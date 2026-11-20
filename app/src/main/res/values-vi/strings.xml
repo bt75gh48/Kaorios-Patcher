@@ -102,6 +102,11 @@
     <string name="browser_split_pane_left">Trái</string>
     <string name="browser_split_pane_right">Phải</string>
     <string name="browser_pane_empty">Không có dữ liệu</string>
+    <string name="browser_patch_mode_title">Chế độ patch</string>
+    <string name="browser_patch_mode_original">1 · Hooks (Android 13–17)</string>
+    <string name="browser_patch_mode_build">2 · Build spoof (chỉ Android 17)</string>
+    <string name="browser_patch_mode_all">3 · Hooks + Build spoof (chỉ Android 17)</string>
+    <string name="browser_patch_mode_hint">Build spoof ghi lại các Build field chỉ có trên Android 17. Máy Android 13–16 dùng mode 1.</string>
     <string name="browser_script_picker_intro">Tick để chọn. Nhóm KaoriosToolbox (2.0.3 / 1.0.9) chỉ được chọn 1 cái. Script “Remove Aosp/Custom rom Hooks” luôn chạy trước các script khác nếu được chọn.</string>
     <string name="browser_tag_title_fmt">Tag release %1$s</string>
     <string name="browser_tag_dialog_extended_body">App sẽ kiểm tra release có asset .dex trước khi chạy.</string>

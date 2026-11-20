@@ -131,6 +131,26 @@ object SmaliEngine {
         return null
     }
 
+    /**
+     * Tất cả file khớp class descriptor trên mọi root — dùng để phát hiện layout mơ hồ
+     * (cùng một class nằm ở nhiều `classesN`), tương ứng guard duplicate của `process_files`.
+     */
+    fun findAllForClass(roots: List<File>, classDescriptor: String): List<File> {
+        val internal = toInternalPath(classDescriptor) ?: return emptyList()
+        val rel = "$internal.smali"
+        val out = mutableListOf<File>()
+        for (root in roots) {
+            val classesDirs = root.listFiles()
+                ?.filter { it.isDirectory && it.name.startsWith("classes", ignoreCase = true) }
+                ?: continue
+            for (cd in classesDirs.sortedBy { it.name }) {
+                val cand = File(cd, rel)
+                if (cand.isFile) out += cand
+            }
+        }
+        return out
+    }
+
     /** `Landroid/app/Activity;` → `android/app/Activity`. Null nếu format sai. */
     fun toInternalPath(desc: String): String? {
         if (!desc.startsWith("L") || !desc.endsWith(";")) return null

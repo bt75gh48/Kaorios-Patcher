@@ -52,6 +52,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -85,6 +86,7 @@ import com.kaorios.patcher.R
 import com.kaorios.patcher.data.log.LogSink
 import com.kaorios.patcher.domain.actions.ActionState
 import com.kaorios.patcher.domain.actions.ActionsRegistry
+import com.kaorios.patcher.domain.actions.PatchMode
 import com.kaorios.patcher.domain.actions.ScriptGroup
 import com.kaorios.patcher.domain.actions.scripts.DexRedivisionScript
 import com.kaorios.patcher.domain.actions.scripts.DisableSecureFlagScript
@@ -510,9 +512,9 @@ fun FileBrowserScreen(
     if (showScriptPicker) {
         ScriptPickerDialog(
             onDismiss = { showScriptPicker = false },
-            onRun = { selected ->
+            onRun = { selected, mode ->
                 showScriptPicker = false
-                vm.requestRunActions(selected)
+                vm.requestRunActions(selected, mode)
             }
         )
     }
@@ -964,7 +966,7 @@ private fun DexMarkDialog(
 @Composable
 private fun ScriptPickerDialog(
     onDismiss: () -> Unit,
-    onRun: (List<ActionsRegistry.Entry>) -> Unit
+    onRun: (List<ActionsRegistry.Entry>, PatchMode) -> Unit
 ) {
     val all = remember { ActionsRegistry.all }
     val selected = remember {
@@ -972,6 +974,8 @@ private fun ScriptPickerDialog(
             all.forEach { put(it.script.id, false) }
         }
     }
+    // Mode 1 là mặc định của patcher 2.0.6.2 — chỉ bật thêm Build spoof khi người dùng chọn.
+    var patchMode by remember { mutableStateOf(PatchMode.ORIGINAL) }
     // Mutual exclusion: TOOLBOX trong group TOOLBOX, UPDATE trong group UPDATE.
     // Ngoài ra TOOLBOX và UPDATE loại trừ lẫn nhau (cả 2 cùng import dex sẽ xung đột).
     fun toggle(entry: ActionsRegistry.Entry) {
@@ -1005,6 +1009,45 @@ private fun ScriptPickerDialog(
         title = { Text(stringResource(R.string.browser_script_picker_title)) },
         text = {
             Column(Modifier.heightIn(min = 200.dp, max = 520.dp)) {
+                Text(
+                    stringResource(R.string.browser_patch_mode_title),
+                    style = MaterialTheme.typography.labelMedium
+                )
+                PatchMode.entries.forEach { mode ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .combinedClickable(
+                                onClick = { patchMode = mode },
+                                onLongClick = {}
+                            )
+                            .padding(vertical = 2.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = patchMode == mode,
+                            onClick = { patchMode = mode }
+                        )
+                        Text(
+                            stringResource(
+                                when (mode) {
+                                    PatchMode.ORIGINAL -> R.string.browser_patch_mode_original
+                                    PatchMode.BUILD -> R.string.browser_patch_mode_build
+                                    PatchMode.ALL -> R.string.browser_patch_mode_all
+                                }
+                            ),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                if (patchMode != PatchMode.ORIGINAL) {
+                    Text(
+                        stringResource(R.string.browser_patch_mode_hint),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                Spacer(Modifier.size(8.dp))
                 Text(
                     stringResource(R.string.browser_script_picker_intro),
                     style = MaterialTheme.typography.bodySmall,
@@ -1068,7 +1111,7 @@ private fun ScriptPickerDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = { onRun(chosen) },
+                onClick = { onRun(chosen, patchMode) },
                 enabled = chosen.isNotEmpty() && !hasEmpty
             ) { Text(stringResource(R.string.browser_script_run_fmt, chosen.size)) }
         },

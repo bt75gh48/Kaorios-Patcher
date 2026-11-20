@@ -39,6 +39,11 @@ data class ScriptOp(
      * không dùng [methodSignature] để locate — hợp ROM dùng `main` thay `run`.
      */
     val methodAnchorLineContains: String? = null,
+    /**
+     * Nếu true: file mục tiêu không có trong workspace thì bỏ qua op thay vì rollback.
+     * Dùng cho bộ hook framework/services — ROM có thể chỉ có một trong hai root.
+     */
+    val optional: Boolean = false,
     val patchMode: PatchMode = PatchMode.ORIGINAL,
     val fileTransform: ((String) -> String)? = null,
     val transform: (SmaliEngine.MutableMethod) -> Unit = {}
